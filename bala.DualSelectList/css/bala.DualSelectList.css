@@ -43,7 +43,7 @@
 }
 
 .dsl-filter {
-	width: calc(50% - 5px);
+	width: calc(50% - 6px);
 	float: left;
 	margin-bottom: 3px;
 	border: 1px solid rgba(1,1,1,0);
@@ -84,5 +84,21 @@
 
 .dsl-panel-item:hover {
 	background-color: #FFC679;
+}
+
+.dsl-panel-item-null {
+	font-size: 1em;
+	width: calc(100% - 22px);
+	margin: 3px;
+	padding: 5px;
+	font-family: Calibri;
+	background-color: white;
+	cursor: pointer;
+	border: 3px dashed lightgray;
+	display: none;
+
+	border-radius: 3px 3px 3px 3px;
+	-moz-border-radius: 3px 3px 3px 3px;
+	-webkit-border-radius: 3px 3px 3px 3px;
 }
 

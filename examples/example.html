@@ -10,7 +10,7 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			var dsl = $('#dualSelectExample').DualSelectList({
-				'candidiateItems' : ['Item 01', 'Item 02', 'Item 03', 'Item 04', 'Item 05']
+				'candidiateItems' : ['Item 01', 'Item 02', 'Item 03', 'Item 04', 'Item 05', 'Item 06', 'Item 07', 'Item 08', 'Item 09']
 			});
 
 			$('#getSel').click(function(){
@@ -19,15 +19,28 @@
 				for (var n=0; n<res.length; ++n) str += res[n] + '\n';
 				$('#selResult').val(str);
 			});
+
+			$('#addSel').click(function(){
+				var items = $('#addIterms').val().split('\n');
+				var res = dsl.setCandidate(items);
+			});
 		});
 	</script>
 </head>
 
 <body>
 	<div>This is the example of jQuery plugin Dual-Select-List, which provids multiple-select function through 2 List-Boxes.</div><br>
-	<div id="dualSelectExample" style="width:500px; height:300px;"></div><br>
-	<div id="getSel" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px;">Get Selection</div>
-	<textarea id="selResult" rows="5" type="textarea" style="width:200px; height:100px; margin-top:5px;"></textarea>
+
+	<div id="dualSelectExample" style="width:500px; height:300px; background-color:#F0F0F0; padding:10px;"></div><br>
+
+	<div style="float:left; margin-right:5px;">
+		<div id="addSel" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px;">Add Candidate</div>
+		<textarea id="addIterms" rows="5" type="textarea" style="width:200px; height:100px; margin-top:5px;"></textarea>
+	</div>
+	<div style="float:left;">
+		<div id="getSel" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px;">Get Selection</div>
+		<textarea id="selResult" rows="5" type="textarea" style="width:200px; height:100px; margin-top:5px;"></textarea>
+	</div>
 </body>
 
 </html>
