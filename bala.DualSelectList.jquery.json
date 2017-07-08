@@ -1,0 +1,35 @@
+{
+	"name": "bala.DualSelectList",
+	"version": "1.0.0",
+	"title": "bala.DualSelectList",
+	"description": "a jQuery plugin to provid multiple-select function through 2 List-Boxes",
+	"keywords": [
+		"multiple select",
+		"multiple selection",
+		"dual select list",
+		"dual list box"
+	],
+	"author": {
+		"name": "Bala Chuang",
+		"email": "balachuang@gmail.com"
+	},
+	"maintainers": [
+		{
+			"name": "Bala Chuang",
+			"email": "balachuang@gmail.com"
+		}
+	],
+	"licenses": [
+		{
+			"type": "GPLv2",
+			"url": "http://www.example.com/licenses/gpl.html"
+		}
+	],
+	"bugs": "https://github.com/balachuang/DualSelectList/issues",
+	"homepage": "https://github.com/balachuang/DualSelectList",
+	"docs": "https://github.com/balachuang/DualSelectList",
+	"download": "https://github.com/balachuang/DualSelectList/archive/master.zip",
+	"dependencies": {
+		"jquery": ">=1.6"
+	}
+}
