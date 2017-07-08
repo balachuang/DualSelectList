@@ -21,4 +21,5 @@ dsl.setCandidate(['Item 01', 'Item 02', 'Item 03', 'Item 04', 'Item 05']);
 var res = dsl.getSelection();
 
 
-* How to registry a jQuery Plugin through Github - Ref: https://github.com/jquery-boilerplate/jquery-boilerplate/wiki/How-to-publish-a-plugin-in-jQuery-Plugin-Registry
+* The jQuery Plugin Registry is now in read-only mode.
+https://plugins.jquery.com/
