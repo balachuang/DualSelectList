@@ -2,9 +2,11 @@
 
 	$.fn.DualSelectList = function(parameter)
 	{
+		// Only allow DIV to be the DualSelectList container
 		if (this.length != 1) return;
 		if (this.prop('tagName') != 'DIV') return;
 
+		// Apply default value
 		var params = $.extend({}, $.fn.DualSelectList.defaults, parameter);
 
 		var thisMain = null;
@@ -20,6 +22,7 @@
 		var yOffset = null;
 
 		this.init = function () {
+			// Initialize DualSelectList content
 			this.append(
 				'<div class="dsl-filter left-panel" ><input class="dsl-filter-input" tyle="text" value="Input Filter"></div>' +
 				'<div class="dsl-filter right-panel"><input class="dsl-filter-input" tyle="text" value="Input Filter"></div>' +
@@ -32,9 +35,13 @@
 			thisRgtPanel = this.find('div.dsl-panel.right-panel');
 			thisItemNull = this.find('div.dsl-panel-item-null');
 
-			if(typeof(params.candidiateItems) === 'string') params.candidiateItems = [params.candidiateItems];
-			if (params.candidiateItems.length > 0) this.setCandidate(params.candidiateItems);
+			// Allow default Candidate and default Selection
+			if(typeof(params.candidateItems) === 'string') params.candidateItems = [params.candidateItems];
+			if(typeof(params.selectionItems) === 'string') params.selectionItems = [params.selectionItems];
+			if (params.candidateItems.length > 0) this.setCandidate(params.candidateItems);
+			if (params.selectionItems.length > 0) this.setSelection(params.selectionItems);
 
+			// When mouse click down in one item, record this item for following actions.
 			$(document).on('mousedown', 'div.dsl-panel-item', function(event) {
 				thisSelect = $(this);
 				isPickup = true;
@@ -42,46 +49,9 @@
 				event.preventDefault();
 			});
 
-//			$(document).on('mousemove', 'div.dsl-panel-item', function(event) {
-//				// move this item...
-//				if (isPickup) {
-//					if (isMoving) {
-//						$(this).css({
-//							'left' : event.screenX + xOffset,
-//							'top'  : event.screenY + yOffset
-//						});
-//
-//						var target = findItemLocation($(this));
-//						if (target.targetItem == null) {
-//							thisItemNull.appendTo(target.targetPanel).show();
-//						}else{
-//							thisItemNull.insertAfter(target.targetItem).show();
-//						}
-//					}else{
-//						if ((Math.abs(event.screenX - srcEvent.screenX) >= 2) ||
-//							(Math.abs(event.screenY - srcEvent.screenY) >= 2))
-//						{
-//							isMoving = true;
-//
-//							var srcPanel = $(this).parent('div.dsl-panel');
-//							var xSrc = $(this).position().left;
-//							var ySrc = $(this).position().top;
-//							xOffset = xSrc - event.screenX;
-//							yOffset = ySrc - event.screenY;
-//							$(this).css({
-//								'position' : 'absolute',
-//								'z-index' : 10,
-//								'left' : xSrc,
-//								'top' : ySrc,
-//								'width' : srcPanel.width()
-//							}).appendTo(thisMain);
-//						}
-//					}
-//				}
-//
-//				event.preventDefault();
-//			});
-
+			// When mouse move in [Body] ...
+			// --> If already click down in one item, drag this item.
+			// --> If no item is clicked, do nothing
 			$(document).on('mousemove', 'body', function(event) {
 				// move this item...
 				if (isPickup) {
@@ -122,7 +92,13 @@
 				event.preventDefault();
 			});
 
+			// When mouse up ...
+			// --> If there is an item clicked down ...
+			// -----> If this item is draged with mouse, drop this item in correct location.
+			// -----> If this item is not draged, calculate it's new location and fly to.
+			// --> If there is no item clicked down, do nothing.
 			$(document).on('mouseup', 'div.dsl-panel-item', function(event) {
+				// Click on an item
 				if (isPickup && !isMoving) {
 					// fly to another panel
 					var srcPanel = $(this).parent('div.dsl-panel');
@@ -136,6 +112,7 @@
 					if (tarItem.length > 0) {
 						xTar = tarItem.position().left;
 						yTar = tarItem.position().top + tarItem.height();
+						yTar = Math.min(yTar, tarPanel.position().top + tarPanel.width());
 					}else{
 						xTar = tarPanel.position().left;
 						yTar = tarPanel.position().top; 
@@ -159,6 +136,7 @@
 					});
 				}
 
+				// Drag-n-Drop an item
 				if (isPickup && isMoving) {
 					// drag-n-drop item
 					var target = findItemLocation($(this));
@@ -177,11 +155,13 @@
 					}
 				}
 
+				// reset the status
 				isPickup = false;
 				isMoving = false;
 				thisItemNull.appendTo(thisMain).hide();
 			});
 
+			// When Clicking on the filter, remove the hint text
 			$(document).on('focus', 'input.dsl-filter-input', function() {
 				var fltText = $(this).val();
 				if (fltText == 'Input Filter') {
@@ -196,6 +176,7 @@
 				}
 			});
 
+			// When leving the filter, add the hint text if there is no filter text
 			$(document).on('focusout', 'input.dsl-filter-input', function() {
 				var fltText = $(this).val();
 				if (fltText == '') {
@@ -210,6 +191,7 @@
 				}
 			});
 
+			// When some text input to the filter, do filter.
 			$(document).on('keyup', 'input.dsl-filter-input', function() {
 				var fltText = $(this).val();
 				var tarPanel = null;
@@ -222,11 +204,11 @@
 				tarPanel.find('div.dsl-panel-item').show();
 				if (fltText != '') {
 					tarPanel.find('div.dsl-panel-item:not(:contains(' + fltText + '))').hide();
-//					tarPanel.find('div.dsl-panel-item:contains(' + fltText + ')').show();
 				}
 			});
 		};
 
+		// Allow user to create the DualSelectList object first, and add candidate list later.
 		this.setCandidate = function (candidate) {
 			for (var n=0; n<candidate.length; ++n) {
 				var itemString = $.trim(candidate[n].toString());
@@ -235,6 +217,7 @@
 			}
 		};
 
+		// Allow user to create the DualSelectList object first, and add selection list later.
 		this.setSelection = function (selection) {
 			for (var n=0; n<selection.length; ++n) {
 				var itemString = $.trim(selection[n].toString());
@@ -243,6 +226,7 @@
 			}
 		};
 
+		// Allow user to get current selection result
 		this.getSelection = function () {
 			var result = new Array();
 			var selection = thisRgtPanel.find('div.dsl-panel-item');
@@ -250,6 +234,7 @@
 			return result;
 		};
 
+		// Function for item location calculation, not public to user.
 		function findItemLocation(objItem) {
 			var target = {
 				targetPanel: null,
@@ -277,10 +262,8 @@
 	}
 
 	$.fn.DualSelectList.defaults = {
-		candidiateItems: [],
-		addAll: 'Add All',
-		remove: 'Remove',
-		removeAll: 'Remove All'
+		candidateItems: [],
+		selectionItems: []
 	};
 
 })(jQuery);
