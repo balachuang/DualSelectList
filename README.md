@@ -8,13 +8,15 @@ How to use:
 1. Create DualSelectList with candidate items
 
 var dsl = $('#dualSelectExample').DualSelectList({
-	'candidiateItems' : ['Item 01', 'Item 02', 'Item 03', 'Item 04', 'Item 05']
+	'candidateItems' : ['Item 01', 'Item 02', 'Item 03', 'Item 04', 'Item 05', 'Item 06', 'Item 07'],
+	'selectionItems' : ['Item 08', 'Item 09', 'Item 10']
 });
 
-2. Set candidate items after DualSelectList created
+2. Set candidate / selection items after DualSelectList created
 
 var dsl = $('#dualSelectExample').DualSelectList();
 dsl.setCandidate(['Item 01', 'Item 02', 'Item 03', 'Item 04', 'Item 05']);
+dsl.setSelection(['Item 06', 'Item 07', 'Item 08', 'Item 09', 'Item 10']);
 
 3. Get select result
 
