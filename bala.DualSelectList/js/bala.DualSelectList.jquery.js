@@ -241,7 +241,7 @@
 				targetItem: null
 			};
 			//var targetPanel = null;
-			if (objItem.position().left <= (0.5 * thisLftPanel.width())) {
+			if (objItem.position().left <= (thisLftPanel.position().left + (0.5 * thisLftPanel.width()))) {
 				target.targetPanel = thisLftPanel;
 			}else{
 				target.targetPanel = thisRgtPanel;
