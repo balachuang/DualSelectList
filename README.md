@@ -50,6 +50,7 @@ Using resetColor('') to reset all color.
 var res = dsl.getSelection();
 ```
 
-The jQuery Plugin Registry is now in read-only mode.
-https://plugins.jquery.com/
-
+>
+> The jQuery Plugin Registry is now in read-only mode.
+> https://plugins.jquery.com/
+>
