@@ -11,7 +11,12 @@
 		$(document).ready(function(){
 			var dsl = $('#dualSelectExample').DualSelectList({
 				'candidateItems' : ['Item 01', 'Item 02', 'Item 03', 'Item 04', 'Item 05', 'Item 06', 'Item 07'],
-				'selectionItems' : ['Item 08', 'Item 09', 'Item 03']
+				'selectionItems' : ['Item 08', 'Item 09', 'Item 03'],
+				'colors' : {
+					'itemText' : 'white',
+					'itemBackground' : 'rgb(0, 51, 204)',
+					'itemHoverBackground' : '#0066ff'
+				}
 			});
 
 			$('#getSel').click(function(){
@@ -24,6 +29,18 @@
 			$('#addSel').click(function(){
 				var items = $('#addIterms').val().split('\n');
 				var res = dsl.setCandidate(items);
+				$('#addIterms').val('');
+			});
+
+			$('#setColor').click(function(){
+				var clrName = $('#colorSelector').val();
+				var clrValue = $('#colorValue').val();
+				dsl.setColor(clrName, clrValue);
+			});
+
+			$('#resetColor').click(function(){
+				var clrName = $('#colorSelector').val();
+				dsl.resetColor(clrName);
 			});
 		});
 	</script>
@@ -34,13 +51,30 @@
 
 	<div id="dualSelectExample" style="width:500px; height:300px; background-color:#F0F0F0; padding:10px;"></div><br>
 
+	<div style="padding-bottom:20px;">
+		Set Color:
+		<select id="colorSelector">
+			<option value="panelBackground">panelBackground</option>
+			<option value="filterText">filterText</option>
+			<option value="itemText">itemText</option>
+			<option value="itemBackground">itemBackground</option>
+			<option value="itemHoverBackground">itemHoverBackground</option>
+			<option value="itemPlaceholderBackground">itemPlaceholderBackground</option>
+			<option value="itemPlaceholderBorder">itemPlaceholderBorder</option>
+			<option value="">All Objects</option>
+		</select>
+		<input id="colorValue" value="" style="width:130px; margin-right:20px;" />
+		<input type="button" id="setColor" value="Set" />
+		<input type="button" id="resetColor" value="Reset" />
+	</div>
+
 	<div style="float:left; margin-right:5px;">
 		<div id="addSel" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px;">Add Candidate</div>
-		<textarea id="addIterms" rows="5" type="textarea" style="width:200px; height:100px; margin-top:5px;"></textarea>
+		<textarea id="addIterms" rows="5" type="textarea" style="width:250px; height:100px; margin-top:5px;"></textarea>
 	</div>
 	<div style="float:left;">
 		<div id="getSel" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px;">Get Selection</div>
-		<textarea id="selResult" rows="5" type="textarea" style="width:200px; height:100px; margin-top:5px;"></textarea>
+		<textarea id="selResult" rows="5" type="textarea" style="width:250px; height:100px; margin-top:5px;"></textarea>
 	</div>
 </body>
 

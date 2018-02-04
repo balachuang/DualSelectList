@@ -35,6 +35,9 @@
 			thisRgtPanel = this.find('div.dsl-panel.right-panel');
 			thisItemNull = this.find('div.dsl-panel-item-null');
 
+			// append color css
+			appendColorStyle();
+
 			// Allow default Candidate and default Selection
 			if(typeof(params.candidateItems) === 'string') params.candidateItems = [params.candidateItems];
 			if(typeof(params.selectionItems) === 'string') params.selectionItems = [params.selectionItems];
@@ -234,6 +237,80 @@
 			return result;
 		};
 
+		// Allow user to change object color
+		this.setColor = function (clsName, clrString) {
+			clsName = $.trim(clsName);
+			clrString = $.trim(clrString);
+			if (!clrString) return;
+
+			switch(clsName) {
+				case 'panelBackground' :
+					params.colors.panelBackground = clrString;
+					break;
+				case 'filterText' :
+					params.colors.filterText = clrString;
+					break;
+				case 'itemText' :
+					params.colors.itemText = clrString;
+					break;
+				case 'itemBackground' :
+					params.colors.itemBackground = clrString;
+					break;
+				case 'itemHoverBackground' :
+					params.colors.itemHoverBackground = clrString;
+					break;
+				case 'itemPlaceholderBackground' :
+					params.colors.itemPlaceholderBackground = clrString;
+					break;
+				case 'itemPlaceholderBorder: ' :
+					params.colors.itemPlaceholderBorder = clrString;
+					break;
+			}
+
+			appendColorStyle();
+		};
+
+		// Allow user to reset object color
+		this.resetColor = function (clsName) {
+			clsName = $.trim(clsName);
+			switch(clsName) {
+				case 'panelBackground' :
+					params.colors.panelBackground = '';
+					break;
+				case 'filterText' :
+					params.colors.filterText = '';
+					break;
+				case 'itemText' :
+					params.colors.itemText = '';
+					break;
+				case 'itemBackground' :
+					params.colors.itemBackground = '';
+					break;
+				case 'itemHoverBackground' :
+					params.colors.itemHoverBackground = '';
+					break;
+				case 'itemPlaceholderBackground' :
+					params.colors.itemPlaceholderBackground = '';
+					break;
+				case 'itemPlaceholderBorder' :
+					params.colors.itemPlaceholderBorder = '';
+					break;
+				case '' :
+					params.colors = {
+						panelBackground: '',
+						filterText: '',
+						itemText: '',
+						itemBackground: '',
+						itemHoverBackground: '',
+						itemPlaceholderBackground: '',
+						itemPlaceholderBorder: ''
+					};
+					break;
+			}
+
+			appendColorStyle();
+		};
+
 		// Function for item location calculation, not public to user.
 		function findItemLocation(objItem) {
 			var target = {
@@ -257,13 +334,37 @@
 			return target;
 		};
 
+		// Function for item location calculation, not public to user.
+		function appendColorStyle() {
+			var cssContent = 
+				( !params.colors.panelBackground           ? '' : '.dsl-panel {background-color: ' + params.colors.panelBackground + ' !important;} ') +
+				( !params.colors.filterText                ? '' : '.dsl-filter-input {color: ' + params.colors.filterText + ' !important;} ') +
+				( !params.colors.itemText                  ? '' : '.dsl-panel-item {color: ' + params.colors.itemText + ' !important;} ') +
+				( !params.colors.itemBackground            ? '' : '.dsl-panel-item {background-color: ' + params.colors.itemBackground + ' !important;} ') +
+				( !params.colors.itemHoverBackground       ? '' : '.dsl-panel-item:hover {background-color: ' + params.colors.itemHoverBackground + ' !important;} ') +
+				( !params.colors.itemPlaceholderBackground ? '' : '.dsl-panel-item-null {background-color: ' + params.colors.itemPlaceholderBackground + ' !important;} ') +
+				( !params.colors.itemPlaceholderBorder     ? '' : '.dsl-panel-item-null {border-color: ' + params.colors.itemPlaceholderBorder + ' !important;} ') ;
+			$('#dual-select-list-style').remove();
+			if (cssContent) $('html>head').append($('<style id="dual-select-list-style">' + cssContent + '</style>'));
+		};
+
 		this.init();
 		return this;
 	}
 
 	$.fn.DualSelectList.defaults = {
 		candidateItems: [],
-		selectionItems: []
+		selectionItems: [],
+		colors: {
+			panelBackground: '',
+			filterText: '',
+			itemText: '',
+			itemBackground: '',
+			itemHoverBackground: '',
+			itemPlaceholderBackground: '',
+			itemPlaceholderBorder: ''
+		}
 	};
 
 })(jQuery);
+
