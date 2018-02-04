@@ -262,7 +262,7 @@
 				case 'itemPlaceholderBackground' :
 					params.colors.itemPlaceholderBackground = clrString;
 					break;
-				case 'itemPlaceholderBorder: ' :
+				case 'itemPlaceholderBorder' :
 					params.colors.itemPlaceholderBorder = clrString;
 					break;
 			}
