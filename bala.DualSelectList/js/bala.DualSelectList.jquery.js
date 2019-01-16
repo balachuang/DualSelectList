@@ -165,8 +165,7 @@
 			});
 
 			// Hotfix bug where sometimes the item won't drop and will stick to the mouse
-			// When keyup on document and isPickup is true,
-			// -- if the escape key pressed, drop back to original location
+			// When isPickup && isMoving && escape is pressed, drop the item in the nearest panel
 			$(document).on('keyup', function(event) {
 				if(isPickup && isMoving && event.keyCode === 27) {
 					// console.log(thisSelect);
