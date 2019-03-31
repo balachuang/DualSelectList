@@ -164,6 +164,32 @@
 				thisItemNull.appendTo(thisMain).hide();
 			});
 
+			// Hotfix bug where sometimes the item won't drop and will stick to the mouse
+			// When isPickup && isMoving && escape is pressed, drop the item in the nearest panel
+			$(document).on('keyup', function(event) {
+				if(isPickup && isMoving && event.keyCode === 27) {
+					// console.log(thisSelect);
+					var target = findItemLocation(thisSelect);
+				    if (target.targetItem == null) {
+                        thisSelect.css({
+                            'position': 'initial',
+                            'z-index': 'initial',
+                            'width': 'calc(100% - 16px)'
+                        }).appendTo(target.targetPanel);
+				    } else {
+                        thisSelect.css({
+                            'position': 'initial',
+                            'z-index': 'initial',
+                            'width': 'calc(100% - 16px)'
+                        }).insertAfter(target.targetItem);
+				    }
+
+				    isPickup = false;
+				    isMoving = false;
+				    thisItemNull.appendTo(thisMain).hide();
+				}
+			});
+			
 			// When Clicking on the filter, remove the hint text
 			$(document).on('focus', 'input.dsl-filter-input', function() {
 				var fltText = $(this).val();
