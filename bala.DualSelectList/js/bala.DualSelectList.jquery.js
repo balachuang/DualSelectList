@@ -65,7 +65,9 @@
 						});
 
 						var target = findItemLocation(thisSelect);
-						if (target.targetItem == null) {
+						if (target.targetFirstPosition) {
+							thisItemNull.prependTo(target.targetPanel).show();
+						}else if (target.targetItem == null) {
 							thisItemNull.appendTo(target.targetPanel).show();
 						}else{
 							thisItemNull.insertAfter(target.targetItem).show();
@@ -143,7 +145,13 @@
 				if (isPickup && isMoving) {
 					// drag-n-drop item
 					var target = findItemLocation($(this));
-					if (target.targetItem == null) {
+					if (target.targetFirstPosition) {
+						$(this).css({
+							'position' : 'initial',
+							'z-index' : 'initial',
+							'width' : 'calc(100% - 16px)'
+						}).prependTo(target.targetPanel);
+					}else if (target.targetItem == null) {
 						$(this).css({
 							'position' : 'initial',
 							'z-index' : 'initial',
@@ -170,7 +178,13 @@
 				if(isPickup && isMoving && event.keyCode === 27) {
 					// console.log(thisSelect);
 					var target = findItemLocation(thisSelect);
-				    if (target.targetItem == null) {
+					if (target.targetFirstPosition) {
+						thisSelect.css({
+							'position' : 'initial',
+							'z-index' : 'initial',
+							'width' : 'calc(100% - 16px)'
+						}).prependTo(target.targetPanel);
+					}else if (target.targetItem == null) {
                         thisSelect.css({
                             'position': 'initial',
                             'z-index': 'initial',
@@ -341,7 +355,8 @@
 		function findItemLocation(objItem) {
 			var target = {
 				targetPanel: null,
-				targetItem: null
+				targetItem: null,
+				targetFirstPosition: false
 			};
 			//var targetPanel = null;
 			if (objItem.position().left <= (thisLftPanel.position().left + (0.5 * thisLftPanel.width()))) {
@@ -353,7 +368,11 @@
 			//var targetItem = null;
 			var candidateItems = target.targetPanel.find('div.dsl-panel-item');
 			for (var n=0; n<candidateItems.length; ++n) {
-				if (objItem.position().top > candidateItems.eq(n).position().top) target.targetItem = candidateItems[n];
+				if (objItem.position().top > candidateItems.eq(n).position().top) {
+					target.targetItem = candidateItems[n];
+				} else if (objItem.position().top <= candidateItems.eq(n).position().top && n === 0){
+					target.targetFirstPosition = true;
+				}
 			}
 
 			//return targetItem;
