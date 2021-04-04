@@ -10,8 +10,19 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			var dsl = $('#dualSelectExample').DualSelectList({
-				'candidateItems' : ['Item 01', 'Item 02', 'Item 03', 'Item 04', 'Item 05', 'Item 06', 'Item 07'],
-				'selectionItems' : ['Item 08', 'Item 09', 'Item 03'],
+//				'candidateItems' : ['Item 01', 'Item 02', 'Item 03', 'Item 04', 'Item 05', 'Item 06', 'Item 07'],
+//				'selectionItems' : ['Item 08', 'Item 09', 'Item 03'],
+
+				// Change Item from pure String to an Json Object.
+				// the "value" field will be displayed on the list.
+				'candidateItems' : [{'id':0, 'value':'Item 01'},
+									{'id':1, 'value':'Item 02'},
+									{'id':2, 'value':'Item 03'},
+									{'id':3, 'value':'Item 04'},
+									{'id':4, 'value':'Item 05'} ],
+				'selectionItems' : [{'id':5, 'value':'Item 06'},
+									{'id':6, 'value':'Item 07'},
+									{'id':7, 'value':'Item 08'} ],
 				'colors' : {
 					'itemText' : 'white',
 					'itemBackground' : 'rgb(0, 51, 204)',
@@ -20,9 +31,10 @@
 			});
 
 			$('#getSel').click(function(){
-				var res = dsl.getSelection();
+				var strOnly = $('#strOnly').prop("checked");
+				var res = dsl.getSelection(strOnly);
 				var str = '';
-				for (var n=0; n<res.length; ++n) str += res[n] + '\n';
+				for (var n=0; n<res.length; ++n) str += JSON.stringify(res[n]) + '\n';
 				$('#selResult').val(str);
 			});
 
@@ -73,7 +85,10 @@
 		<textarea id="addIterms" rows="5" type="textarea" style="width:250px; height:100px; margin-top:5px;"></textarea>
 	</div>
 	<div style="float:left;">
-		<div id="getSel" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px;">Get Selection</div>
+		<div id="getSel" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px; float:left;">Get Selection</div>
+		<div style="background-color:none; margin-left: 10px; margin-top: 5px; width:100px; float:left;">
+			<input id="strOnly" type="checkbox">String Only</input>
+		</div><br>
 		<textarea id="selResult" rows="5" type="textarea" style="width:250px; height:100px; margin-top:5px;"></textarea>
 	</div>
 </body>

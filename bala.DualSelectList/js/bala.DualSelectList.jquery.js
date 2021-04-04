@@ -1,3 +1,7 @@
+/**
+ * 2021/04/03 - Turn the input data from String to JsonObject
+ */
+
 (function($) {
 
 	$.fn.DualSelectList = function(parameter)
@@ -21,6 +25,9 @@
 		var xOffset = null;
 		var yOffset = null;
 
+		var thisCandidateItems = new Array();
+		var thisSelectionItems = new Array();
+
 		this.init = function () {
 			// Initialize DualSelectList content
 			this.append(
@@ -39,8 +46,9 @@
 			appendColorStyle();
 
 			// Allow default Candidate and default Selection
-			if(typeof(params.candidateItems) === 'string') params.candidateItems = [params.candidateItems];
-			if(typeof(params.selectionItems) === 'string') params.selectionItems = [params.selectionItems];
+			// turn pure String input to JSON Object
+			if(typeof(params.candidateItems) !== 'object') params.candidateItems = [{value : params.candidateItems}];
+			if(typeof(params.selectionItems) !== 'object') params.selectionItems = [{value : params.selectionItems}];
 			if (params.candidateItems.length > 0) this.setCandidate(params.candidateItems);
 			if (params.selectionItems.length > 0) this.setSelection(params.selectionItems);
 
@@ -252,28 +260,52 @@
 		};
 
 		// Allow user to create the DualSelectList object first, and add candidate list later.
+		// append the input candidate into thisCandidateItems and record index for getSelection()
 		this.setCandidate = function (candidate) {
 			for (var n=0; n<candidate.length; ++n) {
-				var itemString = $.trim(candidate[n].toString());
+				// check if this item is an object
+				if (candidate[n].value === undefined) candidate[n] = {value : candidate[n]};
+
+				var thisIdx = thisCandidateItems.push(candidate[n]) - 1;
+				var itemString = $.trim(thisCandidateItems[thisIdx].value.toString());
 				if (itemString == '') continue;
-				thisLftPanel.append('<div class="dsl-panel-item">' + itemString + '</div>');
+				thisLftPanel.append('<div class="dsl-panel-item" dlid="c' + thisIdx + '">' + itemString + '</div>');
 			}
 		};
 
 		// Allow user to create the DualSelectList object first, and add selection list later.
+		// append the input selection into thisSelectionItems and record index for getSelection()
 		this.setSelection = function (selection) {
 			for (var n=0; n<selection.length; ++n) {
-				var itemString = $.trim(selection[n].toString());
+				// check if this item is an object
+				if (selection[n].value === undefined) selection[n] = {value : selection[n]};
+
+				var thisIdx = thisSelectionItems.push(selection[n]) - 1;
+				var itemString = $.trim(thisSelectionItems[thisIdx].value.toString());
 				if (itemString == '') continue;
-				thisRgtPanel.append('<div class="dsl-panel-item">' + itemString + '</div>');
+				thisRgtPanel.append('<div class="dsl-panel-item" dlid="s' + thisIdx + '">' + itemString + '</div>');
 			}
 		};
 
 		// Allow user to get current selection result
-		this.getSelection = function () {
+		this.getSelection = function (stringOnly) {
 			var result = new Array();
 			var selection = thisRgtPanel.find('div.dsl-panel-item');
-			for (var n=0; n<selection.length; ++n) result.push(selection.eq(n).text());
+			for (var n=0; n<selection.length; ++n)
+			{
+				if (stringOnly) result.push(selection.eq(n).text());
+				else
+				{
+					var thisIdx = selection.eq(n).attr('dlid');
+					if (thisIdx.startsWith('c')) {
+						thisIdx = eval(thisIdx.substring(1));
+						result.push(thisCandidateItems[thisIdx]);
+					}else{
+						thisIdx = eval(thisIdx.substring(1));
+						result.push(thisSelectionItems[thisIdx]);
+					}
+				}
+			}
 			return result;
 		};
 
