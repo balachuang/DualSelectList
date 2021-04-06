@@ -140,7 +140,7 @@
 					// fly to another panel
 					var srcPanel = $(this).parent('div.dsl-panel');
 					var tarPanel = srcPanel.siblings('div.dsl-panel');
-					var tarItem = tarPanel.find('div.dsl-panel-item:last');
+					var tarItem = tarPanel.find('div.dsl-panel-item:visible:last');
 
 					var xSrc = $(this).position().left;
 					var ySrc = $(this).position().top;
