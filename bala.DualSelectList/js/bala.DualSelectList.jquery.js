@@ -14,8 +14,11 @@
 		var params = $.extend({}, $.fn.DualSelectList.defaults, parameter);
 
 		var thisMain = null;
-		var thisLftPanel = null;
-		var thisRgtPanel = null;
+		var thisPanel = {left: null, right: null};
+		var thisInput = {left: null, right: null};
+		var thisMover = {left: null, right: null};
+		//var thisLftPanel = null;
+		//var thisRgtPanel = null;
 		var thisItemNull = null;
 
 		var thisSelect = null;
@@ -31,15 +34,26 @@
 		this.init = function () {
 			// Initialize DualSelectList content
 			this.append(
-				'<div class="dsl-filter left-panel" ><input class="dsl-filter-input" tyle="text" value="Input Filter"></div>' +
-				'<div class="dsl-filter right-panel"><input class="dsl-filter-input" tyle="text" value="Input Filter"></div>' +
-				'<div class="dsl-panel left-panel" /><div class="dsl-panel right-panel"></div>' +
+				'<div class="dsl-filter left-panel" >' +
+				'	<input class="dsl-filter-input" tyle="text" value="Input Filter" />' +
+				'	<div class="dsl-filter-move-all left-panel">&#x25B6;</div></div>' +
+				'<div class="dsl-filter right-panel">' +
+				'	<input class="dsl-filter-input" tyle="text" value="Input Filter" />' +
+				'	<div class="dsl-filter-move-all right-panel">&#x25C0;</div></div>' +
+				'<div class="dsl-panel left-panel"  />' +
+				'<div class="dsl-panel right-panel" />' +
 				'<div class="dsl-panel-item-null">&nbsp;</div>'
 			);
 
 			thisMain = this;
-			thisLftPanel = this.find('div.dsl-panel.left-panel');
-			thisRgtPanel = this.find('div.dsl-panel.right-panel');
+			//thisLftPanel = this.find('div.dsl-panel.left-panel');
+			//thisRgtPanel = this.find('div.dsl-panel.right-panel');
+			thisPanel.left  = this.find('div.dsl-panel.left-panel');
+			thisPanel.right = this.find('div.dsl-panel.right-panel');
+			thisInput.left  = this.find('div.dsl-filter-input.left-panel');
+			thisInput.right = this.find('div.dsl-filter-input.right-panel');
+			thisMover.left  = this.find('div.dsl-filter-move-all.left-panel');
+			thisMover.right = this.find('div.dsl-filter-move-all.right-panel');
 			thisItemNull = this.find('div.dsl-panel-item-null');
 
 			// append color css
@@ -51,6 +65,10 @@
 			if(typeof(params.selectionItems) !== 'object') params.selectionItems = [{value : params.selectionItems}];
 			if (params.candidateItems.length > 0) this.setCandidate(params.candidateItems);
 			if (params.selectionItems.length > 0) this.setSelection(params.selectionItems);
+
+			// initial hiding Move All Icon
+			toggleMoveAllIcon();
+			toggleItemDisplay();
 
 			// When mouse click down in one item, record this item for following actions.
 			$(document).on('mousedown', 'div.dsl-panel-item', function(event) {
@@ -146,6 +164,10 @@
 							'z-index' : 'initial',
 							'width' : 'calc(100% - 16px)'
 						}).appendTo(tarPanel);
+
+						// update Move All Icon
+						toggleMoveAllIcon();
+						toggleItemDisplay();
 					});
 				}
 
@@ -172,6 +194,9 @@
 							'width' : 'calc(100% - 16px)'
 						}).insertAfter(target.targetItem);
 					}
+
+					// update Move All Icon
+					toggleMoveAllIcon();
 				}
 
 				// reset the status
@@ -206,6 +231,9 @@
                         }).insertAfter(target.targetItem);
 				    }
 
+					// update Move All Icon
+					toggleMoveAllIcon();
+
 				    isPickup = false;
 				    isMoving = false;
 				    thisItemNull.appendTo(thisMain).hide();
@@ -213,6 +241,7 @@
 			});
 			
 			// When Clicking on the filter, remove the hint text
+			// why not using "Place holder" feature of Input element??
 			$(document).on('focus', 'input.dsl-filter-input', function() {
 				var fltText = $(this).val();
 				if (fltText == 'Input Filter') {
@@ -242,20 +271,44 @@
 				}
 			});
 
-			// When some text input to the filter, do filter.
+			// When some text input to the filter, do filter and display Move button.
 			$(document).on('keyup', 'input.dsl-filter-input', function() {
 				var fltText = $(this).val();
 				var tarPanel = null;
-				if ($(this).parent('div.dsl-filter').hasClass('left-panel')) {
-					tarPanel = thisLftPanel;
+					if ($(this).parent('div.dsl-filter').hasClass('left-panel')) {
+					tarPanel = thisPanel.left;
 				}else{
-					tarPanel = thisRgtPanel;
+					tarPanel = thisPanel.right;
 				}
 
 				tarPanel.find('div.dsl-panel-item').show();
 				if (fltText != '') {
+					// do filter and display move button0
 					tarPanel.find('div.dsl-panel-item:not(:contains(' + fltText + '))').hide();
 				}
+
+				// update Move All Icon
+				toggleMoveAllIcon();
+			});
+
+			$('.dsl-filter-move-all').click(function(){
+				// find all filtered items and trigger click()
+				var tarPanel = null;
+				if ($(this).hasClass('left-panel')) tarPanel = thisPanel.left;
+				else								tarPanel = thisPanel.right;
+
+				tarPanel.find('div.dsl-panel-item:visible').each(function(){
+					$(this).trigger('mousedown');
+					$(this).trigger('mouseup');
+				});
+
+				// reset filter
+//				var thisInput = $(this).parent('div.dsl-filter').find('input.dsl-filter-input');
+//				thisInput.val('');
+//				thisInput.trigger('keydown');
+//				thisInput.trigger('keyup');
+//				thisInput.trigger('focus');
+//				thisInput.trigger('focusout');
 			});
 		};
 
@@ -269,7 +322,7 @@
 				var thisIdx = thisCandidateItems.push(candidate[n]) - 1;
 				var itemString = $.trim(thisCandidateItems[thisIdx].value.toString());
 				if (itemString == '') continue;
-				thisLftPanel.append('<div class="dsl-panel-item" dlid="c' + thisIdx + '">' + itemString + '</div>');
+				thisPanel.left.append('<div class="dsl-panel-item" dlid="c' + thisIdx + '">' + itemString + '</div>');
 			}
 		};
 
@@ -283,14 +336,14 @@
 				var thisIdx = thisSelectionItems.push(selection[n]) - 1;
 				var itemString = $.trim(thisSelectionItems[thisIdx].value.toString());
 				if (itemString == '') continue;
-				thisRgtPanel.append('<div class="dsl-panel-item" dlid="s' + thisIdx + '">' + itemString + '</div>');
+				thisPanel.right.append('<div class="dsl-panel-item" dlid="s' + thisIdx + '">' + itemString + '</div>');
 			}
 		};
 
 		// Allow user to get current selection result
 		this.getSelection = function (stringOnly) {
 			var result = new Array();
-			var selection = thisRgtPanel.find('div.dsl-panel-item');
+			var selection = thisPanel.right.find('div.dsl-panel-item');
 			for (var n=0; n<selection.length; ++n)
 			{
 				if (stringOnly) result.push(selection.eq(n).text());
@@ -391,10 +444,10 @@
 				targetFirstPosition: false
 			};
 			//var targetPanel = null;
-			if (objItem.position().left <= (thisLftPanel.position().left + (0.5 * thisLftPanel.width()))) {
-				target.targetPanel = thisLftPanel;
+			if (objItem.position().left <= (thisPanel.left.position().left + (0.5 * thisPanel.left.width()))) {
+				target.targetPanel = thisPanel.left;
 			}else{
-				target.targetPanel = thisRgtPanel;
+				target.targetPanel = thisPanel.right;
 			}
 
 			//var targetItem = null;
@@ -424,6 +477,34 @@
 			$('#dual-select-list-style').remove();
 			if (cssContent) $('html>head').append($('<style id="dual-select-list-style">' + cssContent + '</style>'));
 		};
+
+		// Toggle display of "Move All" icon
+		function toggleMoveAllIcon() {
+			var lftItems = thisPanel.left.find('div.dsl-panel-item:visible');
+			var RgtItems = thisPanel.right.find('div.dsl-panel-item:visible');
+			var lftMover = thisPanel.left.parent('div').find('div.dsl-filter-move-all.left-panel');
+			var RgtMover = thisPanel.left.parent('div').find('div.dsl-filter-move-all.right-panel');
+
+			if (lftItems.length > 0) lftMover.show();
+			else					 lftMover.hide();
+
+			if (RgtItems.length > 0) RgtMover.show();
+			else					 RgtMover.hide();
+		}
+
+		// Toggle Item Display according to current filter
+		function toggleItemDisplay() {
+			var lftFilterText = thisPanel.left.parent('div').find('div.dsl-filter').val();
+			var RgtFilterText = thisPanel.right.parent('div').find('div.dsl-filter').val();
+			console.log(lftFilterText);
+			console.log(RgtFilterText);
+
+//			tarPanel.find('div.dsl-panel-item').show();
+//			if (fltText != '') {
+//				// do filter and display move button0
+//				tarPanel.find('div.dsl-panel-item:not(:contains(' + fltText + '))').hide();
+//			}
+		}
 
 		this.init();
 		return this;
