@@ -10,12 +10,21 @@
 		if (this.length != 1) return;
 		if (this.prop('tagName') != 'DIV') return;
 
+		// constance
+		const CONST_LEFT  = 1;
+		const CONST_RIGHT = 2;
+		const CONST_BOTH  = 3;
+		const CONST_FILTER_PLACEHOLDER = 'Input Filter';
+
 		// Apply default value
 		var params = $.extend({}, $.fn.DualSelectList.defaults, parameter);
 
 		var thisMain = null;
-		var thisLftPanel = null;
-		var thisRgtPanel = null;
+		var thisPanel = {left: null, right: null};
+		var thisInput = {left: null, right: null};
+		var thisMover = {left: null, right: null};
+		//var thisLftPanel = null;
+		//var thisRgtPanel = null;
 		var thisItemNull = null;
 
 		var thisSelect = null;
@@ -31,15 +40,26 @@
 		this.init = function () {
 			// Initialize DualSelectList content
 			this.append(
-				'<div class="dsl-filter left-panel" ><input class="dsl-filter-input" tyle="text" value="Input Filter"></div>' +
-				'<div class="dsl-filter right-panel"><input class="dsl-filter-input" tyle="text" value="Input Filter"></div>' +
-				'<div class="dsl-panel left-panel" /><div class="dsl-panel right-panel"></div>' +
+				'<div class="dsl-filter left-panel" >' +
+				'	<input class="dsl-filter-input" tyle="text" value="' + CONST_FILTER_PLACEHOLDER + '" />' +
+				'	<div class="dsl-filter-move-all left-panel">&#x25B6;</div></div>' +
+				'<div class="dsl-filter right-panel">' +
+				'	<input class="dsl-filter-input" tyle="text" value="' + CONST_FILTER_PLACEHOLDER + '" />' +
+				'	<div class="dsl-filter-move-all right-panel">&#x25C0;</div></div>' +
+				'<div class="dsl-panel left-panel"  />' +
+				'<div class="dsl-panel right-panel" />' +
 				'<div class="dsl-panel-item-null">&nbsp;</div>'
 			);
 
 			thisMain = this;
-			thisLftPanel = this.find('div.dsl-panel.left-panel');
-			thisRgtPanel = this.find('div.dsl-panel.right-panel');
+			//thisLftPanel = this.find('div.dsl-panel.left-panel');
+			//thisRgtPanel = this.find('div.dsl-panel.right-panel');
+			thisPanel.left  = this.find('div.dsl-panel.left-panel').eq(0);
+			thisPanel.right = this.find('div.dsl-panel.right-panel').eq(0);
+			thisInput.left  = this.find('div.dsl-filter.left-panel').find('input.dsl-filter-input').eq(0);
+			thisInput.right = this.find('div.dsl-filter.right-panel').find('input.dsl-filter-input').eq(0);
+			thisMover.left  = this.find('div.dsl-filter-move-all.left-panel').eq(0);
+			thisMover.right = this.find('div.dsl-filter-move-all.right-panel').eq(0);
 			thisItemNull = this.find('div.dsl-panel-item-null');
 
 			// append color css
@@ -51,6 +71,10 @@
 			if(typeof(params.selectionItems) !== 'object') params.selectionItems = [{value : params.selectionItems}];
 			if (params.candidateItems.length > 0) this.setCandidate(params.candidateItems);
 			if (params.selectionItems.length > 0) this.setSelection(params.selectionItems);
+
+			// initial hiding Move All Icon
+			toggleMoveAllIcon(CONST_BOTH);
+			toggleItemDisplay(CONST_BOTH);
 
 			// When mouse click down in one item, record this item for following actions.
 			$(document).on('mousedown', 'div.dsl-panel-item', function(event) {
@@ -116,7 +140,7 @@
 					// fly to another panel
 					var srcPanel = $(this).parent('div.dsl-panel');
 					var tarPanel = srcPanel.siblings('div.dsl-panel');
-					var tarItem = tarPanel.find('div.dsl-panel-item:last');
+					var tarItem = tarPanel.find('div.dsl-panel-item:visible:last');
 
 					var xSrc = $(this).position().left;
 					var ySrc = $(this).position().top;
@@ -146,6 +170,10 @@
 							'z-index' : 'initial',
 							'width' : 'calc(100% - 16px)'
 						}).appendTo(tarPanel);
+
+						// update Move All Icon
+						toggleMoveAllIcon(CONST_BOTH);
+						toggleItemDisplay(CONST_BOTH);
 					});
 				}
 
@@ -172,6 +200,10 @@
 							'width' : 'calc(100% - 16px)'
 						}).insertAfter(target.targetItem);
 					}
+
+					// update Move All Icon
+					toggleMoveAllIcon(CONST_BOTH);
+					toggleItemDisplay(CONST_BOTH);
 				}
 
 				// reset the status
@@ -206,6 +238,9 @@
                         }).insertAfter(target.targetItem);
 				    }
 
+					// update Move All Icon
+					toggleMoveAllIcon(CONST_BOTH);
+
 				    isPickup = false;
 				    isMoving = false;
 				    thisItemNull.appendTo(thisMain).hide();
@@ -213,9 +248,10 @@
 			});
 			
 			// When Clicking on the filter, remove the hint text
+			// why not using "Place holder" feature of Input element??
 			$(document).on('focus', 'input.dsl-filter-input', function() {
 				var fltText = $(this).val();
-				if (fltText == 'Input Filter') {
+				if (fltText == CONST_FILTER_PLACEHOLDER) {
 					$(this).val('');
 					$(this).css({
 						'font-weight' : 'normal',
@@ -231,7 +267,7 @@
 			$(document).on('focusout', 'input.dsl-filter-input', function() {
 				var fltText = $(this).val();
 				if (fltText == '') {
-					$(this).val('Input Filter');
+					$(this).val(CONST_FILTER_PLACEHOLDER);
 					$(this).css({
 						'font-weight' : 'bolder',
 						'font-style' : 'Italic',
@@ -242,20 +278,34 @@
 				}
 			});
 
-			// When some text input to the filter, do filter.
+			// When some text input to the filter, do filter and display Move button.
 			$(document).on('keyup', 'input.dsl-filter-input', function() {
 				var fltText = $(this).val();
 				var tarPanel = null;
-				if ($(this).parent('div.dsl-filter').hasClass('left-panel')) {
-					tarPanel = thisLftPanel;
+					if ($(this).parent('div.dsl-filter').hasClass('left-panel')) {
+					tarPanel = thisPanel.left;
 				}else{
-					tarPanel = thisRgtPanel;
+					tarPanel = thisPanel.right;
 				}
 
-				tarPanel.find('div.dsl-panel-item').show();
-				if (fltText != '') {
-					tarPanel.find('div.dsl-panel-item:not(:contains(' + fltText + '))').hide();
-				}
+				// update Move All Icon and Items display
+				toggleMoveAllIcon(CONST_BOTH);
+				toggleItemDisplay(CONST_BOTH);
+			});
+
+			$('.dsl-filter-move-all').click(function(){
+				// find all filtered items and trigger click()
+				var tarPanel = null;
+				if ($(this).hasClass('left-panel')) tarPanel = thisPanel.left;
+				else								tarPanel = thisPanel.right;
+
+				tarPanel.find('div.dsl-panel-item:visible').each(function(){
+					$(this).trigger('mousedown');
+					$(this).trigger('mouseup');
+				});
+
+				toggleMoveAllIcon(CONST_BOTH);
+				toggleItemDisplay(CONST_BOTH);
 			});
 		};
 
@@ -269,7 +319,7 @@
 				var thisIdx = thisCandidateItems.push(candidate[n]) - 1;
 				var itemString = $.trim(thisCandidateItems[thisIdx].value.toString());
 				if (itemString == '') continue;
-				thisLftPanel.append('<div class="dsl-panel-item" dlid="c' + thisIdx + '">' + itemString + '</div>');
+				thisPanel.left.append('<div class="dsl-panel-item" dlid="c' + thisIdx + '">' + itemString + '</div>');
 			}
 		};
 
@@ -283,14 +333,14 @@
 				var thisIdx = thisSelectionItems.push(selection[n]) - 1;
 				var itemString = $.trim(thisSelectionItems[thisIdx].value.toString());
 				if (itemString == '') continue;
-				thisRgtPanel.append('<div class="dsl-panel-item" dlid="s' + thisIdx + '">' + itemString + '</div>');
+				thisPanel.right.append('<div class="dsl-panel-item" dlid="s' + thisIdx + '">' + itemString + '</div>');
 			}
 		};
 
 		// Allow user to get current selection result
 		this.getSelection = function (stringOnly) {
 			var result = new Array();
-			var selection = thisRgtPanel.find('div.dsl-panel-item');
+			var selection = thisPanel.right.find('div.dsl-panel-item');
 			for (var n=0; n<selection.length; ++n)
 			{
 				if (stringOnly) result.push(selection.eq(n).text());
@@ -391,10 +441,10 @@
 				targetFirstPosition: false
 			};
 			//var targetPanel = null;
-			if (objItem.position().left <= (thisLftPanel.position().left + (0.5 * thisLftPanel.width()))) {
-				target.targetPanel = thisLftPanel;
+			if (objItem.position().left <= (thisPanel.left.position().left + (0.5 * thisPanel.left.width()))) {
+				target.targetPanel = thisPanel.left;
 			}else{
-				target.targetPanel = thisRgtPanel;
+				target.targetPanel = thisPanel.right;
 			}
 
 			//var targetItem = null;
@@ -424,6 +474,41 @@
 			$('#dual-select-list-style').remove();
 			if (cssContent) $('html>head').append($('<style id="dual-select-list-style">' + cssContent + '</style>'));
 		};
+
+		// Toggle display of "Move All" icon
+		function toggleMoveAllIcon(target) {
+			if (target | CONST_LEFT) {
+				var lftItems = thisPanel.left.find('div.dsl-panel-item:visible');
+				if (lftItems.length > 0) thisMover.left.show();
+				else					 thisMover.left.hide();
+			}
+			if (target | CONST_RIGHT) {
+				var RgtItems = thisPanel.right.find('div.dsl-panel-item:visible');
+				if (RgtItems.length > 0) thisMover.right.show();
+				else					 thisMover.right.hide();
+			}
+		}
+
+		// Toggle Item Display according to current filter
+		function toggleItemDisplay(target) {
+			if (target | CONST_LEFT) {
+				var lftFilterText = thisInput.left.val();
+				thisPanel.left.find('div.dsl-panel-item').show();
+				if (lftFilterText == CONST_FILTER_PLACEHOLDER) lftFilterText = '';
+				if (lftFilterText != '') {
+					thisPanel.left.find('div.dsl-panel-item:not(:contains(' + lftFilterText + '))').hide();
+				}
+			}
+			if (target | CONST_RIGHT) {
+				var RgtFilterText = thisInput.right.val();
+				thisPanel.right.find('div.dsl-panel-item').show();
+				if (RgtFilterText == CONST_FILTER_PLACEHOLDER) RgtFilterText = '';
+				if (RgtFilterText != '') {
+					thisPanel.right.find('div.dsl-panel-item:not(:contains(' + RgtFilterText + '))').hide();
+				}
+			}
+
+		}
 
 		this.init();
 		return this;

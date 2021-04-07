@@ -59,13 +59,13 @@ dsl.setSelection(['Item 06', 'Item 07', 'Item 08', 'Item 09', 'Item 10']);
 or
 ```sh
 'candidateItems' : [{'id':0, 'value':'Item 01'},
-					{'id':1, 'value':'Item 02'},
-					{'id':2, 'value':'Item 03'},
-					{'id':3, 'value':'Item 04'},
-					{'id':4, 'value':'Item 05'} ],
+                    {'id':1, 'value':'Item 02'},
+                    {'id':2, 'value':'Item 03'},
+                    {'id':3, 'value':'Item 04'},
+                    {'id':4, 'value':'Item 05'} ],
 'selectionItems' : [{'id':5, 'value':'Item 06'},
-					{'id':6, 'value':'Item 07'},
-					{'id':7, 'value':'Item 08'} ],
+                    {'id':6, 'value':'Item 07'},
+                    {'id':7, 'value':'Item 08'} ],
 ```
 #### A new parameter for getSelection() to decide what data type will be returned. 
 ```sh

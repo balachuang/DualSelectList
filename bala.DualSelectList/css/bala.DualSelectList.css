@@ -68,6 +68,21 @@
 	-webkit-border-radius: 5px 5px 5px 5px;
 }
 
+.dsl-filter-move-all {
+	height: 100%;
+	width: calc(100% - 10px);
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: -22px;
+	text-align: right;
+	color: lightgray;
+	cursor: pointer;
+}
+
+.dsl-filter-move-all:hover {
+	color: #000000;
+}
+
 .dsl-panel-item {
 	font-size: 1em;
 	width: calc(100% - 16px);
