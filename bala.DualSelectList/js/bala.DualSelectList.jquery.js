@@ -20,11 +20,10 @@
 		var params = $.extend({}, $.fn.DualSelectList.defaults, parameter);
 
 		var thisMain = null;
+		var thisMainID = '';
 		var thisPanel = {left: null, right: null};
 		var thisInput = {left: null, right: null};
 		var thisMover = {left: null, right: null};
-		//var thisLftPanel = null;
-		//var thisRgtPanel = null;
 		var thisItemNull = null;
 
 		var thisSelect = null;
@@ -37,7 +36,14 @@
 		var thisCandidateItems = new Array();
 		var thisSelectionItems = new Array();
 
+
 		this.init = function () {
+
+			// add ID to this DIV
+			thisMain = this;
+			thisMainID = '_dsl_' + (new Date).getTime();
+			thisMain.attr('id', thisMainID);
+
 			// Initialize DualSelectList content
 			this.append(
 				'<div class="dsl-filter left-panel" >' +
@@ -51,9 +57,6 @@
 				'<div class="dsl-panel-item-null">&nbsp;</div>'
 			);
 
-			thisMain = this;
-			//thisLftPanel = this.find('div.dsl-panel.left-panel');
-			//thisRgtPanel = this.find('div.dsl-panel.right-panel');
 			thisPanel.left  = this.find('div.dsl-panel.left-panel').eq(0);
 			thisPanel.right = this.find('div.dsl-panel.right-panel').eq(0);
 			thisInput.left  = this.find('div.dsl-filter.left-panel').find('input.dsl-filter-input').eq(0);
@@ -77,8 +80,14 @@
 			toggleItemDisplay(CONST_BOTH);
 
 			// When mouse click down in one item, record this item for following actions.
-			$(document).on('mousedown', 'div.dsl-panel-item', function(event) {
+			$(document).on('mousedown', '#' + thisMainID + ' div.dsl-panel-item', function(event) {
+				// stop all item animation, to avoid 2 items append to the same item
+				thisMain.find('div.dsl-panel-item:animated').stop(false, true);
+
+				// if click on animating object, just skip.
 				thisSelect = $(this);
+				//if (thisSelect.is(':animated')) return;
+
 				isPickup = true;
 				srcEvent = event;
 				event.preventDefault();
@@ -134,16 +143,17 @@
 			// -----> If this item is draged with mouse, drop this item in correct location.
 			// -----> If this item is not draged, calculate it's new location and fly to.
 			// --> If there is no item clicked down, do nothing.
-			$(document).on('mouseup', 'div.dsl-panel-item', function(event) {
+			$(document).on('mouseup', '#' + thisMainID + ' div.dsl-panel-item', function(event) {
 				// Click on an item
 				if (isPickup && !isMoving) {
 					// fly to another panel
-					var srcPanel = $(this).parent('div.dsl-panel');
+					var srcPanel = thisSelect.parent('div.dsl-panel');
 					var tarPanel = srcPanel.siblings('div.dsl-panel');
 					var tarItem = tarPanel.find('div.dsl-panel-item:visible:last');
+					//var tarPanelConst = tarPanel.hasClass('left-panel') ? CONST_LEFT : CONST_RIGHT;
 
-					var xSrc = $(this).position().left;
-					var ySrc = $(this).position().top;
+					var xSrc = thisSelect.position().left;
+					var ySrc = thisSelect.position().top;
 					var xTar = 0;
 					var yTar = 0; 
 					if (tarItem.length > 0) {
@@ -155,7 +165,8 @@
 						yTar = tarPanel.position().top; 
 					}
 
-					$(this).css({
+					thisSelect.css({
+						'pointer-events' : 'none',
 						'position' : 'absolute',
 						'z-index' : 10,
 						'left' : xSrc,
@@ -165,13 +176,15 @@
 						left: xTar,
 						top: yTar
 					},200, function(){
-						$(this).css({
+						thisSelect.css({
+							'pointer-events' : 'initial',
 							'position' : 'initial',
 							'z-index' : 'initial',
 							'width' : 'calc(100% - 16px)'
 						}).appendTo(tarPanel);
 
 						// update Move All Icon
+						//animatingItems.remove(thisSelect);
 						toggleMoveAllIcon(CONST_BOTH);
 						toggleItemDisplay(CONST_BOTH);
 					});
@@ -182,19 +195,19 @@
 					// drag-n-drop item
 					var target = findItemLocation($(this));
 					if (target.targetFirstPosition) {
-						$(this).css({
+						thisSelect.css({
 							'position' : 'initial',
 							'z-index' : 'initial',
 							'width' : 'calc(100% - 16px)'
 						}).prependTo(target.targetPanel);
 					}else if (target.targetItem == null) {
-						$(this).css({
+						thisSelect.css({
 							'position' : 'initial',
 							'z-index' : 'initial',
 							'width' : 'calc(100% - 16px)'
 						}).appendTo(target.targetPanel);
 					}else{
-						$(this).css({
+						thisSelect.css({
 							'position' : 'initial',
 							'z-index' : 'initial',
 							'width' : 'calc(100% - 16px)'
@@ -216,7 +229,6 @@
 			// When isPickup && isMoving && escape is pressed, drop the item in the nearest panel
 			$(document).on('keyup', function(event) {
 				if(isPickup && isMoving && event.keyCode === 27) {
-					// console.log(thisSelect);
 					var target = findItemLocation(thisSelect);
 					if (target.targetFirstPosition) {
 						thisSelect.css({
@@ -249,7 +261,7 @@
 			
 			// When Clicking on the filter, remove the hint text
 			// why not using "Place holder" feature of Input element??
-			$(document).on('focus', 'input.dsl-filter-input', function() {
+			$(document).on('focus', '#' + thisMainID + ' input.dsl-filter-input', function() {
 				var fltText = $(this).val();
 				if (fltText == CONST_FILTER_PLACEHOLDER) {
 					$(this).val('');
@@ -264,7 +276,7 @@
 			});
 
 			// When leving the filter, add the hint text if there is no filter text
-			$(document).on('focusout', 'input.dsl-filter-input', function() {
+			$(document).on('focusout', '#' + thisMainID + ' input.dsl-filter-input', function() {
 				var fltText = $(this).val();
 				if (fltText == '') {
 					$(this).val(CONST_FILTER_PLACEHOLDER);
@@ -279,7 +291,7 @@
 			});
 
 			// When some text input to the filter, do filter and display Move button.
-			$(document).on('keyup', 'input.dsl-filter-input', function() {
+			$(document).on('keyup', '#' + thisMainID + ' input.dsl-filter-input', function() {
 				var fltText = $(this).val();
 				var tarPanel = null;
 					if ($(this).parent('div.dsl-filter').hasClass('left-panel')) {
@@ -293,7 +305,7 @@
 				toggleItemDisplay(CONST_BOTH);
 			});
 
-			$('.dsl-filter-move-all').click(function(){
+			$('#' + thisMainID + ' div.dsl-filter-move-all').click(function(){
 				// find all filtered items and trigger click()
 				var tarPanel = null;
 				if ($(this).hasClass('left-panel')) tarPanel = thisPanel.left;
@@ -440,14 +452,13 @@
 				targetItem: null,
 				targetFirstPosition: false
 			};
-			//var targetPanel = null;
+
 			if (objItem.position().left <= (thisPanel.left.position().left + (0.5 * thisPanel.left.width()))) {
 				target.targetPanel = thisPanel.left;
 			}else{
 				target.targetPanel = thisPanel.right;
 			}
 
-			//var targetItem = null;
 			var candidateItems = target.targetPanel.find('div.dsl-panel-item');
 			for (var n=0; n<candidateItems.length; ++n) {
 				if (objItem.position().top > candidateItems.eq(n).position().top) {
@@ -457,7 +468,6 @@
 				}
 			}
 
-			//return targetItem;
 			return target;
 		};
 

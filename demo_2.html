@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=UTF-8">
+	<title>DualSelectList example</title>
+	<link rel="stylesheet" type="text/css" href="bala.DualSelectList/css/bala.DualSelectList.css">
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script type="text/javascript" src="bala.DualSelectList/js/bala.DualSelectList.jquery.js"></script>
+	<script type="text/javascript">
+		let canItems =	[{'id':0, 'value':'Item 01'} ,
+						 {'id':1, 'value':'Item 02'} ,
+						 {'id':2, 'value':'Item 03'} ,
+						 {'id':3, 'value':'Item 04'} ,
+						 {'id':4, 'value':'Item 05'} ];
+		let selItems =	[{'id':5, 'value':'Item 06'} ,
+						 {'id':6, 'value':'Item 07'} ,
+						 {'id':7, 'value':'Item 08'} ];
+
+		$(document).ready(function(){
+			// =========== selector 1
+			var dsl1 = $('#dualSelectExample1').DualSelectList({
+				// Change Item from pure String to an Json Object.
+				// the "value" field will be displayed on the list.
+				'candidateItems' : canItems,
+				'selectionItems' : selItems,
+				'colors' : {
+					'itemText' : 'white',
+					'itemBackground' : 'rgb(0, 51, 204)',
+					'itemHoverBackground' : '#0066ff'
+				}
+			});
+
+			$('#getSel1').click(function(){
+				var strOnly = $('#strOnly1').prop("checked");
+				var res = dsl1.getSelection(strOnly);
+				var str = '';
+				for (var n=0; n<res.length; ++n) str += JSON.stringify(res[n]) + '\n';
+				$('#selResult1').val(str);
+			});
+
+			$('#addSel1').click(function(){
+				var items = $('#addIterms1').val().split('\n');
+				var res = dsl1.setCandidate(items);
+				$('#addIterms1').val('');
+			});
+
+			// =========== selector 2
+			var dsl2 = $('#dualSelectExample2').DualSelectList({
+				// Change Item from pure String to an Json Object.
+				// the "value" field will be displayed on the list.
+				'candidateItems' : canItems,
+				'selectionItems' : selItems,
+				'colors' : {
+					'itemText' : 'white',
+					'itemBackground' : 'rgb(0, 51, 204)',
+					'itemHoverBackground' : '#0066ff'
+				}
+			});
+
+			$('#getSel2').click(function(){
+				var strOnly = $('#strOnly2').prop("checked");
+				var res = dsl2.getSelection(strOnly);
+				var str = '';
+				for (var n=0; n<res.length; ++n) str += JSON.stringify(res[n]) + '\n';
+				$('#selResult2').val(str);
+			});
+
+			$('#addSel2').click(function(){
+				var items = $('#addIterms2').val().split('\n');
+				var res = dsl2.setCandidate(items);
+				$('#addIterms2').val('');
+			});
+		});
+	</script>
+</head>
+
+<body>
+	<div>This is the example of jQuery plugin Dual-Select-List, which provids multiple-select function through 2 List-Boxes.</div><br>
+
+	<div style="width:100%;">
+		<div style="width:50%; float:left;">
+			<div id="dualSelectExample1" style="width:500px; height:300px; background-color:#F0F0F0; padding:10px;"></div><br>
+			<div style="float:left; margin-right:5px;">
+				<div id="addSel1" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px;">Add Candidate</div>
+				<textarea id="addIterms1" rows="5" type="textarea" style="width:250px; height:100px; margin-top:5px;"></textarea>
+			</div>
+			<div style="float:left;">
+				<div id="getSel1" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px; float:left;">Get Selection</div>
+				<div style="background-color:none; margin-left: 10px; margin-top: 5px; width:100px; float:left;">
+					<input id="strOnly1" type="checkbox">String Only</input>
+				</div><br>
+				<textarea id="selResult1" rows="5" type="textarea" style="width:250px; height:100px; margin-top:5px;"></textarea>
+			</div>
+		</div>
+		<div style="width:50%; float:left;">
+			<div id="dualSelectExample2" style="width:500px; height:300px; background-color:#F0F0F0; padding:10px;"></div><br>
+			<div style="float:left; margin-right:5px;">
+				<div id="addSel2" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px;">Add Candidate</div>
+				<textarea id="addIterms2" rows="5" type="textarea" style="width:250px; height:100px; margin-top:5px;"></textarea>
+			</div>
+			<div style="float:left;">
+				<div id="getSel2" style="background-color:lightgray; color:black; padding:5px; text-align:center; cursor:pointer; width:150px; float:left;">Get Selection</div>
+				<div style="background-color:none; margin-left: 10px; margin-top: 5px; width:100px; float:left;">
+					<input id="strOnly2" type="checkbox">String Only</input>
+				</div><br>
+				<textarea id="selResult2" rows="5" type="textarea" style="width:250px; height:100px; margin-top:5px;"></textarea>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
