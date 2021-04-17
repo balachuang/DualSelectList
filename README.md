@@ -3,8 +3,8 @@
 bala.DualSelectList is a jQuery plugin to provid multiple-select function through 2 List-Boxes.
 
 Demo page: 
-1. Single: https://balachuang.github.io/DualSelectList/demo_1.html
-1. Deboul: https://balachuang.github.io/DualSelectList/demo_2.html
+1. Single Element: https://balachuang.github.io/DualSelectList/demo_1.html
+1. Multiple Elements: https://balachuang.github.io/DualSelectList/demo_2.html
 
 
 # How to use:
